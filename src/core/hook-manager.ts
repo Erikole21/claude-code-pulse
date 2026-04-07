@@ -44,8 +44,20 @@ function writeSettings(settings: Settings): void {
   writeFileSync(path, JSON.stringify(settings, null, 2) + '\n', 'utf-8')
 }
 
-function hasPulseHook(entries: HookMatcher[]): boolean {
-  return entries.some((e) => e._pulse === true)
+function findPulseHookIndex(entries: Record<string, unknown>[]): number {
+  return entries.findIndex((e) => e._pulse === true)
+}
+
+function isValidFormat(entry: Record<string, unknown>): boolean {
+  return typeof entry.matcher === 'string' && Array.isArray(entry.hooks)
+}
+
+function buildPulseHook(): HookMatcher {
+  return {
+    _pulse: true,
+    matcher: '',
+    hooks: [{ type: 'command', command: getHookCommand() }],
+  }
 }
 
 export function addHook(): void {
@@ -59,17 +71,19 @@ export function addHook(): void {
     settings.hooks.SessionStart = []
   }
 
-  const sessionStart = settings.hooks.SessionStart as HookMatcher[]
+  const sessionStart = settings.hooks.SessionStart as Record<string, unknown>[]
+  const idx = findPulseHookIndex(sessionStart)
 
-  if (hasPulseHook(sessionStart)) {
+  if (idx >= 0) {
+    // Migrate old format to new if needed
+    if (!isValidFormat(sessionStart[idx])) {
+      sessionStart[idx] = buildPulseHook()
+      writeSettings(settings)
+    }
     return
   }
 
-  sessionStart.push({
-    _pulse: true,
-    matcher: '',
-    hooks: [{ type: 'command', command: getHookCommand() }],
-  })
+  sessionStart.push(buildPulseHook())
   writeSettings(settings)
 }
 
@@ -83,7 +97,7 @@ export function removeHook(): void {
   const sessionStart = settings.hooks.SessionStart as HookMatcher[] | undefined
   if (!sessionStart) return
 
-  if (!hasPulseHook(sessionStart)) return
+  if (findPulseHookIndex(sessionStart) < 0) return
 
   const filtered = sessionStart.filter((e) => e._pulse !== true)
 
