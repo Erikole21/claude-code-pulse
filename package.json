@@ -1,0 +1,51 @@
+{
+  "name": "claude-code-pulse",
+  "version": "1.0.0",
+  "description": "Keep Claude Code alive. Fresh docs, built-in tutor, always in sync.",
+  "type": "module",
+  "bin": {
+    "pulse": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skills-fallback",
+    "README.md"
+  ],
+  "keywords": [
+    "claude-code",
+    "claude",
+    "anthropic",
+    "skills",
+    "ai",
+    "developer-tools",
+    "mcp",
+    "hooks",
+    "tutor"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:skills": "tsx scripts/generate-fallback-skills.ts",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest",
+    "prepublishOnly": "npm run build && npm run build:skills"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "cosmiconfig": "^9.0.0",
+    "p-limit": "^6.1.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "undici": "^6.19.0",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsup": "^8.1.0",
+    "tsx": "^4.15.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  }
+}

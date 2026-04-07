@@ -1,0 +1,17 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Node.js 18+, TypeScript, commander (CLI), undici (HTTP), unified+remark (Markdown), cosmiconfig (config), vitest (testing), tsup (build)
+  Domain: npm CLI package called "claude-code-pulse" (CLI: pulse) that downloads Claude Code docs from code.claude.com and transforms them into Skills installed in .claude/skills/
+  Key features: doc sync with ETag caching, Claude CLI transformer with static fallback, SessionStart hook auto-sync, interactive tutor system
+  SDD reference: ./claude-code-pulse-SDD.md contains the full system design document
+  Conventions: ESM modules, TypeScript strict mode, conventional commits
+
+rules:
+  proposal:
+    - Reference the SDD (claude-code-pulse-SDD.md) for detailed module specs
+    - Keep proposals focused on the specific change scope
+  tasks:
+    - Break tasks into chunks of max 2 hours
+    - Include test tasks for each module
+    - Follow the SDD implementation order
