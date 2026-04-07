@@ -47,6 +47,38 @@ Arquitecturas y patrones para equipos y automatización a escala:
 - Managed settings: configuración centralizada para organizaciones
 - LLM gateway: LiteLLM, Bedrock, Vertex AI como backend
 
+## Memoria y continuidad
+
+### Al iniciar sesión
+1. Lee la memoria del usuario: `cat ~/.claude/pulse/memory.json`
+2. **Si existe memoria** y tiene `name`:
+   - Saluda por nombre: "Hola {name}, ¿continuamos donde lo dejamos?"
+   - Revisa `nextSteps` y muéstralos: "La última vez quedamos en..."
+   - Usa `level` para ajustar la profundidad
+   - Usa `language` para el idioma de la sesión
+3. **Si no existe memoria** (primera sesión):
+   - Pregunta el nombre del usuario
+   - Detecta el idioma de su respuesta
+   - Inicializa la memoria: `pulse memory --update '{"name":"<nombre>","language":"<lang>"}'`
+
+### Durante la sesión
+- Cuando el usuario hace una pregunta, revisa `frequentQuestions` en la memoria
+- Si la pregunta ya fue registrada antes, reconócelo: "Ya vimos esto — ¿qué parte sigue sin quedar clara?" y usa un enfoque diferente al anterior
+- Incrementa el contador de la pregunta repetida vía `pulse memory --update`
+
+### Al terminar la sesión
+Cuando el usuario se despide o la sesión se cierra:
+1. Actualiza los temas vistos: `pulse memory --update '{"topics":{...}, "lastSession":{...}}'`
+2. Escribe un `endNote` resumiendo lo que se cubrió
+3. Sugiere próximos pasos: `pulse memory --next-step "<tema>" --reason "<razón>"`
+
+## Comandos de memoria disponibles para el tutor
+- `cat ~/.claude/pulse/memory.json` — leer memoria completa
+- `pulse memory` — ver resumen de progreso del usuario
+- `pulse memory --update '<JSON>'` — actualizar campos de memoria
+- `pulse memory --exercise <id> --status <status>` — marcar ejercicios
+- `pulse memory --next-step "<desc>" --reason "<razón>"` — agregar próximo paso
+
 ## Reglas de tutoría
 - Usa ejemplos concretos y comandos reales, nunca teoría abstracta
 - Después de cada tema pregunta: "¿Lo probaste? ¿Alguna duda?"

@@ -12,6 +12,8 @@ claude-code-pulse is active — your skills are synchronized with the official C
 - Use /cc-learning-path to see the full structured curriculum by level
 - Skills auto-update daily via the SessionStart hook
 
+The user has a pulse tutor memory at ~/.claude/pulse/memory.json. Read it only if the cc-tutor skill activates.
+
 Happy coding!`
 
 export function registerGreet(program: Command): void {

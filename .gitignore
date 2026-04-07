@@ -2,4 +2,5 @@ node_modules/
 dist/
 skills-fallback/
 .claude/skills/.pulse-meta.json
+.claude/settings.local.json
 .claude/pulse/
