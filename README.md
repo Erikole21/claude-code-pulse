@@ -38,6 +38,12 @@ Then re-initialize each repo to apply hook and skill fixes:
 pulse init --force
 ```
 
+Use `--yes` to skip the confirmation prompt:
+
+```bash
+pulse init --force --yes
+```
+
 ### Quick run (no global install)
 
 ```bash
