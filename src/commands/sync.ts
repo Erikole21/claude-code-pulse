@@ -26,7 +26,7 @@ interface SyncResult {
 
 function getSkillsFallbackDir(): string {
   const thisFile = fileURLToPath(import.meta.url)
-  const root = join(dirname(thisFile), '..', '..')
+  const root = join(dirname(thisFile), '..')
   return join(root, 'skills-fallback')
 }
 
@@ -103,7 +103,25 @@ export async function syncCore(options: SyncOptions): Promise<SyncResult[]> {
       }
 
       // Transform
-      const transformed = await transformSkill(skill, fetchResult.content)
+      let transformed = await transformSkill(skill, fetchResult.content)
+
+      // If manual split produced no results, fall back to bundled skills
+      if (transformed.length === 0 && skill.manualSections && skill.manualSections.length > 0) {
+        warn(`  ⚠ Split failed for ${skill.id}, using bundled fallback`)
+        for (const section of skill.manualSections) {
+          try {
+            const fallbackContent = loadStaticSkillContent(section.id)
+            transformed.push({
+              id: section.id,
+              filename: `.claude/skills/${section.id}/SKILL.md`,
+              content: fallbackContent,
+              transformedWith: 'fixed',
+            })
+          } catch {
+            warn(`  ✗ No fallback found for ${section.id}`)
+          }
+        }
+      }
 
       // Install
       install(transformed.map((t) => ({ id: t.id, content: t.content })))
