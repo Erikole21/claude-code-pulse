@@ -42,6 +42,156 @@ This command installs pulse skills in `.claude/skills`, runs an initial sync, an
 - New Claude Code sessions in an initialized repository use that repo's `.claude` configuration and hooks automatically.
 - In a brand-new repository, run `pulse init` first.
 
+## What can you do with pulse?
+
+### Beginner — Your first steps
+
+Never used Claude Code? Pulse guides you from zero:
+
+```
+You:   "It's my first time using Claude Code, help me"
+Pulse: "Welcome! I'm Pulse, your Claude Code tutor. What's your name?
+        ...Great! Let's start with the basics. Open any project folder
+        and type 'claude'. That's it — you're in a session.
+        Try asking Claude to explain a file in your project."
+```
+
+Ask anything, Pulse adapts to your language automatically:
+
+```
+You:   "No entiendo qué es CLAUDE.md"
+Pulse: "Es un archivo que le da contexto a Claude sobre tu proyecto.
+        Piensa en él como un README pero para Claude. Creemos uno juntos:
+        crea un archivo CLAUDE.md en la raíz de tu proyecto..."
+```
+
+Learn what commands are available:
+
+```
+You:   "What commands can I use?"
+Pulse: "Here are the essentials to get started:
+        /help     — see all available commands
+        /compact  — compress conversation when it gets long
+        /cost     — check how much you've spent this session
+        /memory   — see what Claude remembers about your project
+        Try /help now and tell me what catches your eye!"
+```
+
+### Intermediate — Level up your workflow
+
+Already using Claude Code? Pulse helps you unlock powerful features:
+
+```
+You:   "I want to automate something every time I start a session"
+Pulse: "That's what hooks are for! A SessionStart hook runs a shell command
+        every time Claude opens. For example, to auto-format your code:
+
+        In .claude/settings.json:
+        { 'hooks': { 'SessionStart': [{ 'command': 'npm run lint:fix' }] } }
+
+        Want me to walk you through setting one up for your project?"
+```
+
+Connect external tools:
+
+```
+You:   "Can Claude access my database?"
+Pulse: "Yes! Through MCP servers. You configure them in settings.json
+        and Claude gets read/write access. Here's how to connect PostgreSQL:
+        ..."
+```
+
+Create custom skills for your team:
+
+```
+You:   "How do I create a skill for code review?"
+Pulse: "Create a file at .claude/skills/code-review/SKILL.md with
+        instructions for how Claude should review code in your stack.
+        Let me show you the structure..."
+```
+
+### Advanced — Scale with your team
+
+For power users building automation and team workflows:
+
+```
+You:   "I need multiple agents working in parallel on different tasks"
+Pulse: "Agent teams let you coordinate multiple Claude instances.
+        You define agents with roles (reviewer, implementer, tester)
+        and they work on isolated worktrees. Here's the pattern:
+        ..."
+```
+
+Integrate with CI/CD:
+
+```
+You:   "How do I get Claude to review PRs automatically?"
+Pulse: "With GitHub Actions. Add @claude mentions in your workflow
+        and Claude reviews PRs, suggests fixes, and can even push
+        commits. Here's a working workflow file:
+        ..."
+```
+
+Run Claude in scripts:
+
+```
+You:   "I want to use Claude in a bash script"
+Pulse: "Headless mode! Use 'claude --print' for single-shot tasks:
+
+        claude --print 'summarize the changes in the last 5 commits'
+
+        It returns the output directly to stdout. Perfect for
+        CI pipelines, cron jobs, or chaining with other tools."
+```
+
+### Pulse remembers you across sessions
+
+Your first session:
+
+```
+Pulse: "Hey! I'm Pulse, your Claude Code tutor. What's your name?"
+You:   "Ana"
+Pulse: "Nice to meet you, Ana! Let's figure out your level..."
+```
+
+Your next session, days later:
+
+```
+Pulse: "Hey Ana! Last time we set up your first hook. Ready to
+        learn about MCP servers? That was your next step."
+```
+
+Check your progress anytime:
+
+```bash
+$ pulse memory
+  Name:     Ana
+  Level:    intermediate
+  Language: es
+  Joined:   4/1/2026
+
+  Topics: 5 completed, 2 in progress, 3 pending
+    ✓ basic-commands
+    ✓ permissions
+    ✓ claude-md
+    ✓ git-workflow
+    ✓ hooks
+    … mcp-servers
+    … sub-agents
+
+  Next steps:
+    → mcp-servers: Ready after mastering hooks
+```
+
+### Set it up once per repo, works every session
+
+```bash
+npm install -g claude-code-pulse
+cd my-project
+pulse init
+# Done. Every Claude Code session in this repo now has fresh docs and Pulse as your tutor.
+```
+
 ## What pulse does
 
 - **Doc sync**: downloads Claude Code docs and keeps skills fresh.
