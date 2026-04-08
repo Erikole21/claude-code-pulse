@@ -17,5 +17,5 @@ export function getVersion(): string {
       }
     }
   }
-  return cached
+  return cached!
 }

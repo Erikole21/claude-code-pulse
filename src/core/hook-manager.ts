@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
+import { homedir } from 'node:os'
 import { getHookCommand } from '../utils/platform.js'
 
 interface CommandHook {
@@ -17,6 +18,10 @@ interface HookMatcher {
 interface Settings {
   hooks?: {
     SessionStart?: HookMatcher[]
+    [key: string]: unknown
+  }
+  permissions?: {
+    allow?: string[]
     [key: string]: unknown
   }
   [key: string]: unknown
@@ -60,6 +65,37 @@ function buildPulseHook(): HookMatcher {
   }
 }
 
+function getPulseMemoryPermissions(): string[] {
+  const pulseDir = join(homedir(), '.claude', 'pulse')
+  return [
+    `Read(${pulseDir}/**)`,
+    `Edit(${pulseDir}/**)`,
+    `Write(${pulseDir}/**)`,
+  ]
+}
+
+function addPulsePermissions(settings: Settings): boolean {
+  if (!settings.permissions) {
+    settings.permissions = {}
+  }
+  if (!settings.permissions.allow) {
+    settings.permissions.allow = []
+  }
+
+  const required = getPulseMemoryPermissions()
+  const existing = new Set(settings.permissions.allow)
+  let changed = false
+
+  for (const perm of required) {
+    if (!existing.has(perm)) {
+      settings.permissions.allow.push(perm)
+      changed = true
+    }
+  }
+
+  return changed
+}
+
 export function addHook(): void {
   const settings = readSettings()
 
@@ -73,18 +109,39 @@ export function addHook(): void {
 
   const sessionStart = settings.hooks.SessionStart as Record<string, unknown>[]
   const idx = findPulseHookIndex(sessionStart)
+  let changed = false
 
   if (idx >= 0) {
     // Migrate old format to new if needed
     if (!isValidFormat(sessionStart[idx])) {
       sessionStart[idx] = buildPulseHook()
-      writeSettings(settings)
+      changed = true
     }
-    return
+  } else {
+    sessionStart.push(buildPulseHook())
+    changed = true
   }
 
-  sessionStart.push(buildPulseHook())
-  writeSettings(settings)
+  // Always ensure pulse memory permissions are present
+  const permChanged = addPulsePermissions(settings)
+
+  if (changed || permChanged) {
+    writeSettings(settings)
+  }
+}
+
+function removePulsePermissions(settings: Settings): void {
+  if (!settings.permissions?.allow) return
+
+  const pulsePerms = new Set(getPulseMemoryPermissions())
+  settings.permissions.allow = settings.permissions.allow.filter((p) => !pulsePerms.has(p))
+
+  if (settings.permissions.allow.length === 0) {
+    delete settings.permissions.allow
+  }
+  if (Object.keys(settings.permissions).length === 0) {
+    delete settings.permissions
+  }
 }
 
 export function removeHook(): void {
@@ -92,24 +149,25 @@ export function removeHook(): void {
   if (!existsSync(path)) return
 
   const settings = readSettings()
-  if (!settings.hooks) return
 
-  const sessionStart = settings.hooks.SessionStart as HookMatcher[] | undefined
-  if (!sessionStart) return
+  // Remove hook
+  const sessionStart = settings.hooks?.SessionStart as HookMatcher[] | undefined
+  if (sessionStart && findPulseHookIndex(sessionStart) >= 0) {
+    const filtered = sessionStart.filter((e) => e._pulse !== true)
 
-  if (findPulseHookIndex(sessionStart) < 0) return
+    if (filtered.length > 0) {
+      settings.hooks!.SessionStart = filtered
+    } else {
+      delete settings.hooks!.SessionStart
+    }
 
-  const filtered = sessionStart.filter((e) => e._pulse !== true)
-
-  if (filtered.length > 0) {
-    settings.hooks.SessionStart = filtered
-  } else {
-    delete settings.hooks.SessionStart
+    if (Object.keys(settings.hooks!).length === 0) {
+      delete settings.hooks
+    }
   }
 
-  if (Object.keys(settings.hooks).length === 0) {
-    delete settings.hooks
-  }
+  // Remove permissions
+  removePulsePermissions(settings)
 
   writeSettings(settings)
 }
