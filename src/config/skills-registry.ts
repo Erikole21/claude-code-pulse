@@ -10,6 +10,7 @@ export interface SkillDefinition {
   name: string
   description: string
   disableModelInvocation?: boolean
+  allowedTools?: string
   splitStrategy?: 'none' | 'sections' | 'manual'
   manualSections?: ManualSection[]
   tokenBudget?: number
@@ -25,8 +26,9 @@ export const SKILLS_REGISTRY: SkillDefinition[] = [
     id: 'pulse',
     sourceUrl: null,
     name: 'pulse',
-    description: "Pulse - Claude Code tutor. TRIGGER when: user mentions 'pulse', is new to Claude Code, asks how to get started, wants help or guidance, or asks about any Claude Code feature, config, or workflow.",
+    description: "Interactive Claude Code tutor named Pulse. Activate when: user says 'pulse', 'hey pulse', 'en que vamos pulse', asks how to learn Claude Code, wants guidance, or asks about any Claude Code feature.",
     disableModelInvocation: false,
+    allowedTools: 'Read(~/.claude/pulse/**) Read(~\\.claude\\pulse\\**) Bash(pulse memory*)',
     splitStrategy: 'none',
     tokenBudget: 900,
     priority: 'critical',

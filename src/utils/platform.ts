@@ -22,10 +22,10 @@ export function getHookCommand(): string {
   const platform = detectPlatform()
 
   if (platform === 'windows') {
-    return 'npx.cmd pulse sync --if-stale 86400 --silent & npx.cmd pulse greet --once'
+    return 'npx.cmd pulse sync --if-stale 86400 --silent & npx.cmd pulse greet'
   }
 
-  return 'npx pulse sync --if-stale 86400 --silent && npx pulse greet --once || true'
+  return 'npx pulse sync --if-stale 86400 --silent && npx pulse greet || true'
 }
 
 export function isClaudeCliAvailable(): Promise<boolean> {

@@ -24,6 +24,7 @@ function frontmatterFor(
   source: string,
   syncedAt: string,
   disableModelInvocation: boolean | undefined,
+  allowedTools?: string,
 ): string {
   const shouldDisableModelInvocation = disableModelInvocation ?? true
 
@@ -32,6 +33,7 @@ function frontmatterFor(
     `name: ${skillId}`,
     `description: ${JSON.stringify(description)}`,
     ...(shouldDisableModelInvocation ? ['disable-model-invocation: true'] : []),
+    ...(allowedTools ? [`allowed-tools: ${allowedTools}`] : []),
     '_pulse: true',
     `_syncedAt: "${syncedAt}"`,
     `_source: "${source}"`,
@@ -77,11 +79,12 @@ function writeFallbackSkill(
   body: string,
   syncedAt: string,
   disableModelInvocation: boolean | undefined,
+  allowedTools?: string,
 ): void {
   const outputFile = join(fallbackDir, id, 'SKILL.md')
   mkdirSync(dirname(outputFile), { recursive: true })
   const content =
-    frontmatterFor(id, description, source, syncedAt, disableModelInvocation) + `${body.trim()}\n`
+    frontmatterFor(id, description, source, syncedAt, disableModelInvocation, allowedTools) + `${body.trim()}\n`
   writeFileSync(outputFile, content, 'utf-8')
 }
 
@@ -97,6 +100,7 @@ async function processStaticSkill(def: SkillDefinition, syncedAt: string): Promi
     body,
     syncedAt,
     def.disableModelInvocation,
+    def.allowedTools,
   )
   log(`  ✓ ${def.id} (static)`)
   return 1
@@ -118,7 +122,7 @@ async function processDocSkill(def: SkillDefinition, syncedAt: string): Promise<
 
   let generated = 0
   for (const section of sourceSections) {
-    const transformedSection = transformStatic(section.content, tokenBudget)
+    const transformedSection = transformStatic(section.content, tokenBudget, def.sourceUrl ?? undefined)
     const resolved = resolveSplitResult(def, section)
     writeFallbackSkill(
       resolved.finalId,
@@ -127,6 +131,7 @@ async function processDocSkill(def: SkillDefinition, syncedAt: string): Promise<
       transformedSection,
       syncedAt,
       def.disableModelInvocation,
+      def.allowedTools,
     )
     generated++
   }

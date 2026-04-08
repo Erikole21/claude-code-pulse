@@ -15,6 +15,7 @@ Rules:
 - Start directly with the content — no frontmatter, no title like "# Skill"
 - Respect the token budget — be concise but preserve technical accuracy
 - Prioritize: code examples > tables > parameter lists > prose explanations
+- IMPORTANT: This is a SUMMARY. If a question cannot be fully answered with this content, Claude should fetch the full official documentation instead of guessing.
 
 Transform this documentation:`
 
@@ -44,6 +45,7 @@ export function resetCliCache(): void {
 export async function transformWithClaude(
   rawMarkdown: string,
   tokenBudget: number,
+  sourceUrl?: string,
 ): Promise<string | null> {
   const available = await checkCliAvailable()
   if (!available) {
@@ -83,7 +85,11 @@ export async function transformWithClaude(
         return
       }
 
-      resolve(result)
+      if (sourceUrl) {
+        resolve(result + `\n\n> **This content is a summary.** If you cannot answer the user's question with the information above, DO NOT guess or invent an answer. Instead, fetch the complete official documentation at: ${sourceUrl}`)
+      } else {
+        resolve(result)
+      }
     })
 
     // Pipe the prompt via stdin

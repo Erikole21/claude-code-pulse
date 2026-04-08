@@ -55,8 +55,9 @@ function cleanAst() {
 /**
  * Transform raw markdown by removing JSX, images, and internal links.
  * Truncates to tokenBudget at section boundaries.
+ * When truncated, appends a note directing Claude to fetch the full doc.
  */
-export function transformStatic(rawMarkdown: string, tokenBudget: number): string {
+export function transformStatic(rawMarkdown: string, tokenBudget: number, sourceUrl?: string): string {
   const processor = unified()
     .use(remarkParse)
     .use(cleanAst)
@@ -71,7 +72,15 @@ export function transformStatic(rawMarkdown: string, tokenBudget: number): strin
     return cleaned
   }
 
-  return truncateAtSectionBoundary(cleaned, charBudget)
+  const truncated = truncateAtSectionBoundary(cleaned, charBudget)
+  if (sourceUrl) {
+    return truncated + '\n\n' + truncationNotice(sourceUrl)
+  }
+  return truncated
+}
+
+function truncationNotice(sourceUrl: string): string {
+  return `> **This content is a summary.** If you cannot answer the user's question with the information above, DO NOT guess or invent an answer. Instead, fetch the complete official documentation at: ${sourceUrl}`
 }
 
 function truncateAtSectionBoundary(text: string, charBudget: number): string {

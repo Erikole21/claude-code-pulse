@@ -16,6 +16,7 @@ function generateFrontmatter(
   description: string,
   source: string,
   disableModelInvocation: boolean | undefined,
+  allowedTools?: string,
 ): string {
   const syncedAt = new Date().toISOString()
   const shouldDisableModelInvocation = disableModelInvocation ?? true
@@ -25,6 +26,7 @@ function generateFrontmatter(
     `name: ${name}`,
     `description: ${JSON.stringify(description)}`,
     ...(shouldDisableModelInvocation ? ['disable-model-invocation: true'] : []),
+    ...(allowedTools ? [`allowed-tools: ${allowedTools}`] : []),
     '_pulse: true',
     `_syncedAt: "${syncedAt}"`,
     `_source: "${source}"`,
@@ -55,6 +57,7 @@ export async function transformSkill(
       def.description,
       'static',
       def.disableModelInvocation,
+      def.allowedTools,
     )
     return [{
       id: def.id,
@@ -64,27 +67,28 @@ export async function transformSkill(
     }]
   }
 
-  // Try Claude transformer first, fallback to static
-  let transformed: string
-  let method: 'claude' | 'static'
+  // Split FIRST on raw content, then transform each section individually
+  const strategy = def.splitStrategy ?? 'none'
+  const sections = splitDocument(rawContent, strategy, def.manualSections)
 
-  const claudeResult = await transformWithClaude(rawContent, tokenBudget)
-  if (claudeResult) {
-    transformed = claudeResult
-    method = 'claude'
-    log(`  → ${def.id}: transformed with Claude`)
-  } else {
-    transformed = transformStatic(rawContent, tokenBudget)
-    method = 'static'
-    log(`  → ${def.id}: transformed with static fallback`)
+  // Transform each section
+  const transformedSections: { id: string; content: string; method: 'claude' | 'static' }[] = []
+  for (const section of sections) {
+    const claudeResult = await transformWithClaude(section.content, tokenBudget, source)
+    if (claudeResult) {
+      transformedSections.push({ id: section.id, content: claudeResult, method: 'claude' })
+    } else {
+      transformedSections.push({ id: section.id, content: transformStatic(section.content, tokenBudget, source), method: 'static' })
+    }
   }
 
-  // Apply splitting strategy
-  const strategy = def.splitStrategy ?? 'none'
-  const sections = splitDocument(transformed, strategy, def.manualSections)
+  if (transformedSections.length > 0) {
+    const method = transformedSections[0].method
+    log(`  → ${def.id}: transformed with ${method === 'claude' ? 'Claude' : 'static fallback'}`)
+  }
 
   // Generate TransformedSkill for each section
-  return sections.map((section) => {
+  return transformedSections.map((section) => {
     const skillId = section.id ? `${def.id}-${section.id}` : def.id
     // For manual sections, use the section id directly if it already includes the base id
     const finalId = def.manualSections?.find((ms) => ms.id === section.id)
@@ -99,13 +103,14 @@ export async function transformSkill(
       description,
       source,
       def.disableModelInvocation,
+      def.allowedTools,
     )
 
     return {
       id: finalId,
       filename: `.claude/skills/${finalId}/SKILL.md`,
       content: frontmatter + section.content,
-      transformedWith: method,
+      transformedWith: section.method,
     }
   })
 }
