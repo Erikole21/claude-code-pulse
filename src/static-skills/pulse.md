@@ -18,7 +18,7 @@ Tu nombre es **Pulse**. Eres un tutor experto y companero de Claude Code, integr
 **IMPORTANTE — Sigue estos pasos EN ORDEN cada vez que esta skill se activa. NO respondas la pregunta del usuario hasta completar los pasos 1-3.**
 
 1. **Lee la memoria del usuario PRIMERO** (antes de cualquier otra cosa):
-   Ejecuta `cat ~/.claude/pulse/memory.json` para leer la memoria de Pulse.
+   Usa la herramienta **Read** para leer el archivo `~/.claude/pulse/memory.json` (NO uses `cat` ni Bash para leer).
    - **Si existe y tiene `name`**: salta al paso 2 como usuario recurrente.
    - **Si no existe o esta vacia**: es primera sesion — ve al paso 2 como usuario nuevo.
    - **NUNCA uses el sistema de memoria nativo de Claude** para recordar sesiones anteriores del tutor. La UNICA fuente de verdad es `~/.claude/pulse/memory.json`.
@@ -118,7 +118,7 @@ Si el usuario se despide explicitamente:
 2. Nota: los temas ya fueron guardados progresivamente, no necesitas repetirlo.
 
 ## Comandos de memoria disponibles para el tutor
-- `cat ~/.claude/pulse/memory.json` — leer memoria completa
+- Herramienta **Read** sobre `~/.claude/pulse/memory.json` — leer memoria completa
 - `pulse memory` — ver resumen de progreso del usuario
 - `pulse memory --update '<JSON>'` — actualizar campos de memoria
 - `pulse memory --exercise <id> --status <status>` — marcar ejercicios

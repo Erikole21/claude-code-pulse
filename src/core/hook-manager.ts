@@ -71,6 +71,7 @@ function getPulseMemoryPermissions(): string[] {
     `Read(${pulseDir}/**)`,
     `Edit(${pulseDir}/**)`,
     `Write(${pulseDir}/**)`,
+    `Bash(pulse memory*)`,
   ]
 }
 
