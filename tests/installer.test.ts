@@ -1,8 +1,8 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { install, isManaged, getInstalledSkills } from '../src/core/installer.js'
+import { install, isManaged, getInstalledSkills, pruneManagedSkills } from '../src/core/installer.js'
 import { writeMeta, type PulseMeta } from '../src/core/meta.js'
 
 describe('installer', () => {
@@ -114,6 +114,30 @@ describe('installer', () => {
 
     it('returns empty array when no metadata exists', () => {
       expect(getInstalledSkills()).toEqual([])
+    })
+  })
+
+  describe('pruneManagedSkills', () => {
+    it('removes obsolete pulse-managed skills that are not allowed', () => {
+      install([{ id: 'cc-tutor', content: 'legacy tutor' }])
+      install([{ id: 'pulse', content: 'new tutor' }])
+
+      const removed = pruneManagedSkills(new Set(['pulse']))
+
+      expect(removed).toEqual(['cc-tutor'])
+      expect(existsSync(join(dir, '.claude', 'skills', 'cc-tutor', 'SKILL.md'))).toBe(false)
+      expect(existsSync(join(dir, '.claude', 'skills', 'pulse', 'SKILL.md'))).toBe(true)
+    })
+
+    it('does not remove user-owned skills even if not allowed', () => {
+      const customDir = join(dir, '.claude', 'skills', 'cc-custom')
+      mkdirSync(customDir, { recursive: true })
+      writeFileSync(join(customDir, 'SKILL.md'), '# user skill', 'utf-8')
+
+      const removed = pruneManagedSkills(new Set(['pulse']))
+
+      expect(removed).toEqual([])
+      expect(existsSync(join(customDir, 'SKILL.md'))).toBe(true)
     })
   })
 })

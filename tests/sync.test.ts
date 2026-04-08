@@ -11,6 +11,7 @@ const {
   warnMock,
   readFileSyncMock,
   generateSkillIndexMock,
+  pruneManagedSkillsMock,
 } = vi.hoisted(() => ({
   installMock: vi.fn(),
   loadConfigMock: vi.fn(),
@@ -22,6 +23,7 @@ const {
   warnMock: vi.fn(),
   readFileSyncMock: vi.fn(),
   generateSkillIndexMock: vi.fn(),
+  pruneManagedSkillsMock: vi.fn(),
 }))
 
 vi.mock('../src/config/skills-registry.js', () => ({
@@ -62,6 +64,7 @@ vi.mock('../src/core/transformer.js', () => ({
 
 vi.mock('../src/core/installer.js', () => ({
   install: installMock,
+  pruneManagedSkills: pruneManagedSkillsMock,
 }))
 
 vi.mock('../src/core/meta.js', () => ({
@@ -104,11 +107,13 @@ describe('sync command static skills', () => {
     warnMock.mockReset()
     readFileSyncMock.mockReset()
     generateSkillIndexMock.mockReset()
+    pruneManagedSkillsMock.mockReset()
 
     loadConfigMock.mockResolvedValue({ skills: ['all'] })
     readMetaMock.mockReturnValue(metaState)
     isStaleMock.mockReturnValue(true)
     generateSkillIndexMock.mockReturnValue('## Skills disponibles\n- `/cc-x` — Example\n')
+    pruneManagedSkillsMock.mockReturnValue([])
     readFileSyncMock.mockImplementation((path: string) => {
       if (path.endsWith('/pulse/SKILL.md') || path.endsWith('\\pulse\\SKILL.md')) {
         return 'Tutor base content'
@@ -144,5 +149,16 @@ describe('sync command static skills', () => {
     expect(tutorContent).toBe('Tutor base content')
     expect(learningPathContent).toBe('Learning path base content')
     expect(learningPathContent).not.toContain('## Skills disponibles')
+  })
+
+  it('prunes obsolete managed skills when force is enabled', async () => {
+    pruneManagedSkillsMock.mockReturnValue(['cc-tutor'])
+
+    await syncCore({ skills: ['pulse', 'cc-learning-path'], force: true, silent: true })
+
+    expect(pruneManagedSkillsMock).toHaveBeenCalledTimes(1)
+    const allowedIds = pruneManagedSkillsMock.mock.calls[0][0] as Set<string>
+    expect(allowedIds.has('pulse')).toBe(true)
+    expect(allowedIds.has('cc-learning-path')).toBe(true)
   })
 })

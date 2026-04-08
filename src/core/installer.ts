@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { readMeta } from './meta.js'
 
@@ -55,4 +55,28 @@ export function install(skills: SkillInput[]): void {
 export function getInstalledSkills(): string[] {
   const meta = readMeta()
   return Object.keys(meta.skills)
+}
+
+export function pruneManagedSkills(allowedIds: Set<string>): string[] {
+  const base = skillsBase()
+  if (!existsSync(base)) return []
+
+  const removed: string[] = []
+  const entries = readdirSync(base, { withFileTypes: true })
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue
+
+    const skillId = entry.name
+    // Safety: only prune pulse-managed skill namespaces.
+    if (!(skillId === 'pulse' || skillId.startsWith('cc-'))) continue
+    if (allowedIds.has(skillId)) continue
+
+    const dirPath = join(base, skillId)
+    if (!isManaged(dirPath)) continue
+
+    rmSync(dirPath, { recursive: true, force: true })
+    removed.push(skillId)
+  }
+
+  return removed
 }

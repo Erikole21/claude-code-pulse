@@ -3,7 +3,7 @@ import { SKILLS_REGISTRY, type SkillDefinition } from '../config/skills-registry
 import { loadConfig } from '../config/loader.js'
 import { fetchDoc } from '../core/fetcher.js'
 import { transformSkill } from '../core/transformer.js'
-import { install } from '../core/installer.js'
+import { install, pruneManagedSkills } from '../core/installer.js'
 import { readMeta, writeMeta, isStale } from '../core/meta.js'
 import { log, warn, setSilent } from '../utils/logger.js'
 import { readFileSync } from 'node:fs'
@@ -64,6 +64,15 @@ export async function syncCore(options: SyncOptions): Promise<SyncResult[]> {
   const meta = readMeta()
   const results: SyncResult[] = []
   let hasErrors = false
+
+  if (options.force) {
+    const allowedIds = new Set(skills.map((s) => s.id))
+    const removedIds = pruneManagedSkills(allowedIds)
+    for (const id of removedIds) {
+      delete meta.skills[id]
+      log(`  ✓ ${id} removed (obsolete managed skill)`)
+    }
+  }
 
   log('Syncing skills...')
 
