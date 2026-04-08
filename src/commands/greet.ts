@@ -23,6 +23,7 @@ export function registerGreet(program: Command): void {
   program
     .command('greet')
     .description('Output welcome context for SessionStart hook')
+    .option('--once', '(deprecated, ignored)')
     .action(() => {
       const meta = readMeta()
 
@@ -35,7 +36,12 @@ export function registerGreet(program: Command): void {
         message = ALWAYS
       }
 
-      const output = JSON.stringify({ additionalContext: message })
+      const output = JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: 'SessionStart',
+          additionalContext: message,
+        },
+      })
       process.stdout.write(output + '\n')
     })
 }
