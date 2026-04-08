@@ -12,6 +12,8 @@ claude-code-tutor is active — your skills are synchronized with the official C
 - Use /cc-learning-path to see the full structured curriculum by level
 - Skills auto-update daily via the SessionStart hook
 
+IMPORTANT: "Pulse" is the name of your built-in tutor. Whenever the user mentions "pulse" in any context (e.g. "hey pulse", "en que vamos pulse?", "pulse help me"), ALWAYS activate the pulse skill. Also activate it when the user is new to Claude Code or asks for help learning it.
+
 The user has a pulse tutor memory at ~/.claude/pulse/memory.json. Read it only if the pulse skill activates.
 
 Happy coding!`

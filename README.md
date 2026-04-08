@@ -1,6 +1,6 @@
 # claude-code-tutor
 
-Keep Claude Code alive. Fresh docs, built-in tutor, always in sync.
+Your Claude Code companion. Fresh docs, built-in tutor (Pulse), always in sync.
 
 ![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933)
 ![TypeScript](https://img.shields.io/badge/typescript-5.x-3178c6)
@@ -59,6 +59,19 @@ This command installs pulse skills in `.claude/skills`, runs an initial sync, an
 - Each repository must be initialized once.
 - New Claude Code sessions in an initialized repository use that repo's `.claude` configuration and hooks automatically.
 - In a brand-new repository, run `pulse init` first.
+
+## How Pulse activates
+
+**Pulse** is your built-in tutor — it has a name, a personality, and remembers your progress. It activates automatically inside Claude Code — no slash command needed. It triggers when you:
+
+- **Mention Pulse** anywhere in your message: `"pulse"`, `"hey pulse, help me"`, `"en que vamos pulse?"`
+- **Are new to Claude Code**: `"it's my first time"`, `"how do I get started?"`
+- **Ask for help or guidance**: `"how can you help me?"`, `"what can I do here?"`
+- **Ask about any Claude Code feature**: hooks, MCP, skills, agents, settings, permissions, channels, plugins, workflows, and more — anything covered by the installed skills
+
+Pulse does **not** activate for regular coding tasks like `"fix the bug in app.ts"` or `"add a login page"`. It only responds when the conversation is about Claude Code itself.
+
+> **Tip:** You can also invoke Pulse explicitly with `/pulse` if you prefer.
 
 ## What can you do with pulse?
 
