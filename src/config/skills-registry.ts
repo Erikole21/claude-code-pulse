@@ -25,7 +25,7 @@ export const SKILLS_REGISTRY: SkillDefinition[] = [
     id: 'pulse',
     sourceUrl: null,
     name: 'pulse',
-    description: "Pulse - Claude Code tutor. TRIGGER when: user mentions 'pulse', is new to Claude Code, asks how to get started, wants help or guidance, or asks about hooks, MCP, skills, settings, or permissions.",
+    description: "Pulse - Claude Code tutor. TRIGGER when: user mentions 'pulse', is new to Claude Code, asks how to get started, wants help or guidance, or asks about any Claude Code feature, config, or workflow.",
     disableModelInvocation: false,
     splitStrategy: 'none',
     tokenBudget: 900,
