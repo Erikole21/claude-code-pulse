@@ -1,8 +1,4 @@
-## Purpose
-
-Provides a utility to dynamically generate a skill index for the cc-tutor skill, listing all available skills from the registry grouped by priority.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Skill index generator utility
 The system SHALL provide a utility function `generateSkillIndex(registry: SkillDefinition[]): string` in `src/core/skill-index.ts` that generates a markdown section listing all available skills from the registry. Each entry SHALL include the skill's `/name` invoke command and its description. Skills SHALL be grouped by priority (critical, high, medium). The generator SHALL exclude the `pulse` skill from the index (since pulse is the consumer of the index, not a reference skill).
@@ -26,14 +22,3 @@ The system SHALL provide a utility function `generateSkillIndex(registry: SkillD
 #### Scenario: Section-split skills list the parent only
 - **WHEN** a skill has `splitStrategy: "sections"` without `manualSections`
 - **THEN** the index lists only the parent `/skill-id` (not each generated sub-skill, since section IDs are dynamic)
-
-### Requirement: Index output format
-The generated index SHALL be valid markdown with a level-2 heading (`## Skills disponibles`) followed by a brief instruction for the tutor, then grouped skill lists. Each entry SHALL be a bullet with the format: `- \`/skill-id\` — description`.
-
-#### Scenario: Markdown structure
-- **WHEN** the generated index is rendered
-- **THEN** it starts with `## Skills disponibles`, followed by group headings and bullet-list entries
-
-#### Scenario: Entry format
-- **WHEN** any entry in the index is read
-- **THEN** it matches the pattern `- \`/skill-id\` — description text`

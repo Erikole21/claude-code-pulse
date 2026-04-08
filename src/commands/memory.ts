@@ -39,7 +39,7 @@ function formatDate(iso: string): string {
 async function showProgress(): Promise<void> {
   const memory = await readMemory()
   if (!memory) {
-    log('No tutor sessions recorded yet. Start a session with the cc-tutor skill.')
+    log('No tutor sessions recorded yet. Start a session with /pulse.')
     return
   }
 

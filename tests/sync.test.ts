@@ -27,9 +27,9 @@ const {
 vi.mock('../src/config/skills-registry.js', () => ({
   SKILLS_REGISTRY: [
     {
-      id: 'cc-tutor',
+      id: 'pulse',
       sourceUrl: null,
-      name: 'cc-tutor',
+      name: 'pulse',
       description: 'Tutor',
       splitStrategy: 'none',
       priority: 'critical',
@@ -110,20 +110,27 @@ describe('sync command static skills', () => {
     isStaleMock.mockReturnValue(true)
     generateSkillIndexMock.mockReturnValue('## Skills disponibles\n- `/cc-x` — Example\n')
     readFileSyncMock.mockImplementation((path: string) => {
-      if (path.includes('cc-tutor')) return 'Tutor base content'
-      if (path.includes('cc-learning-path')) return 'Learning path base content'
+      if (path.endsWith('/pulse/SKILL.md') || path.endsWith('\\pulse\\SKILL.md')) {
+        return 'Tutor base content'
+      }
+      if (
+        path.endsWith('/cc-learning-path/SKILL.md')
+        || path.endsWith('\\cc-learning-path\\SKILL.md')
+      ) {
+        return 'Learning path base content'
+      }
       return ''
     })
   })
 
-  it('appends generated index only to cc-tutor static skill', async () => {
-    const results = await syncCore({ skills: ['cc-tutor', 'cc-learning-path'], silent: true })
+  it('installs bundled static content for pulse and learning path', async () => {
+    const results = await syncCore({ skills: ['pulse', 'cc-learning-path'], silent: true })
 
     expect(results).toHaveLength(2)
-    expect(results.map((r) => r.id)).toEqual(['cc-tutor', 'cc-learning-path'])
-    expect(generateSkillIndexMock).toHaveBeenCalledTimes(1)
+    expect(results.map((r) => r.id)).toEqual(['pulse', 'cc-learning-path'])
+    expect(generateSkillIndexMock).not.toHaveBeenCalled()
 
-    const tutorInstallCall = installMock.mock.calls.find((call) => call[0][0].id === 'cc-tutor')
+    const tutorInstallCall = installMock.mock.calls.find((call) => call[0][0].id === 'pulse')
     const learningPathInstallCall = installMock.mock.calls.find(
       (call) => call[0][0].id === 'cc-learning-path',
     )
@@ -134,8 +141,7 @@ describe('sync command static skills', () => {
     const tutorContent = tutorInstallCall![0][0].content as string
     const learningPathContent = learningPathInstallCall![0][0].content as string
 
-    expect(tutorContent).toContain('Tutor base content')
-    expect(tutorContent).toContain('## Skills disponibles')
+    expect(tutorContent).toBe('Tutor base content')
     expect(learningPathContent).toBe('Learning path base content')
     expect(learningPathContent).not.toContain('## Skills disponibles')
   })

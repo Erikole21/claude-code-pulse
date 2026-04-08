@@ -9,7 +9,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 const PRIORITY_ORDER = ['critical', 'high', 'medium'] as const
 
 export function generateSkillIndex(registry: SkillDefinition[]): string {
-  const entries = registry.filter((s) => s.id !== 'cc-tutor')
+  const entries = registry.filter((s) => s.id !== 'pulse')
 
   const grouped = new Map<string, string[]>()
   for (const priority of PRIORITY_ORDER) {

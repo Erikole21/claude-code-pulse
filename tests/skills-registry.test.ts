@@ -23,9 +23,9 @@ describe('filterByPriority', () => {
     }
   })
 
-  it('keeps only cc-tutor model-invocable', () => {
+  it('keeps only pulse model-invocable', () => {
     for (const skill of SKILLS_REGISTRY) {
-      if (skill.id === 'cc-tutor') {
+      if (skill.id === 'pulse') {
         expect(skill.disableModelInvocation).toBe(false)
       } else {
         expect(skill.disableModelInvocation ?? true).toBe(true)

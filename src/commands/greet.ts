@@ -8,11 +8,11 @@ interface GreetOptions {
 const WELCOME_MESSAGE = `\
 claude-code-tutor is active — your skills are synchronized with the official Claude Code docs.
 
-- Use /cc-tutor for an interactive guided tour of Claude Code features
+- Use /pulse for an interactive guided tour of Claude Code features
 - Use /cc-learning-path to see the full structured curriculum by level
 - Skills auto-update daily via the SessionStart hook
 
-The user has a pulse tutor memory at ~/.claude/pulse/memory.json. Read it only if the cc-tutor skill activates.
+The user has a pulse tutor memory at ~/.claude/pulse/memory.json. Read it only if the pulse skill activates.
 
 Happy coding!`
 

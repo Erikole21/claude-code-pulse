@@ -5,12 +5,12 @@ import { SKILLS_REGISTRY, type SkillDefinition } from '../src/config/skills-regi
 describe('generateSkillIndex', () => {
   const index = generateSkillIndex(SKILLS_REGISTRY)
 
-  it('excludes cc-tutor from the index', () => {
-    expect(index).not.toContain('`/cc-tutor`')
+  it('excludes pulse from the index', () => {
+    expect(index).not.toContain('`/pulse`')
   })
 
   it('includes non-tutor skills', () => {
-    const nonTutor = SKILLS_REGISTRY.filter((s) => s.id !== 'cc-tutor' && !s.manualSections)
+    const nonTutor = SKILLS_REGISTRY.filter((s) => s.id !== 'pulse' && !s.manualSections)
     for (const skill of nonTutor) {
       expect(index).toContain(`\`/${skill.id}\``)
     }

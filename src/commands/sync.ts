@@ -70,7 +70,7 @@ export async function syncCore(options: SyncOptions): Promise<SyncResult[]> {
   for (const skill of skills) {
     try {
       if (skill.static) {
-        // Static skills: install from bundled content (fallback already includes dynamic index for cc-tutor)
+        // Static skills: install from bundled content (fallback already includes dynamic index for pulse)
         const content = loadStaticSkillContent(skill.id)
         install([{ id: skill.id, content }])
         meta.skills[skill.id] = {

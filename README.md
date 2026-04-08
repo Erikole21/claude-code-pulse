@@ -179,6 +179,8 @@ Pulse: "Hey Ana! Last time we set up your first hook. Ready to
         learn about MCP servers? That was your next step."
 ```
 
+Pulse saves progress incrementally after each topic it explains, not just at the end of the session. If you close the terminal mid-conversation, your progress is still there.
+
 Check your progress anytime:
 
 ```bash
@@ -213,14 +215,16 @@ pulse init
 ## What pulse does
 
 - **Doc sync**: downloads Claude Code docs and keeps skills fresh.
-- **Built-in tutor**: includes `cc-tutor` for guided help in-session.
+- **Bundled fallback**: if the official docs are unreachable, pulse installs pre-built skills so you are never left without reference material.
+- **Built-in tutor**: includes `pulse` for guided help in-session. Reads your memory first, greets you by name, and saves progress incrementally so nothing is lost if the session ends unexpectedly.
 - **Learning path**: includes `cc-learning-path` for structured onboarding.
+- **Skill index**: dynamically generates a reference index of all installed skills and appends it to `pulse`, so Pulse always knows which skills to recommend.
 
 ## Skills
 
 | ID | Description | Priority |
 |---|---|---|
-| `cc-tutor` | Interactive tutor to guide users and answer Claude Code questions. | `critical` |
+| `pulse` | Claude Code companion: tutor + motivator with practical guidance and ideas. | `critical` |
 | `cc-learning-path` | Structured multi-level learning path. | `high` |
 | `cc-changelog` | Recent updates and changes in Claude Code. | `critical` |
 | `cc-hooks-events` | Hook events table and when they trigger. | `critical` |
@@ -267,7 +271,7 @@ Pulse only manages skills marked with `_pulse: true`, so user-owned custom skill
 
 ## Your tutor progress
 
-Pulse remembers your learning progress across sessions in `~/.claude/pulse/memory.json`.
+Pulse remembers your learning progress across sessions in `~/.claude/pulse/memory.json`. This is the **only** source of truth for tutor memory — Pulse does not use Claude's native auto-memory system for session continuity.
 
 | Command | Description |
 |---|---|
@@ -285,6 +289,7 @@ Memory is stored locally and never leaves your machine. Use `pulse uninstall --p
 
 - **ETag caching**: unchanged docs return `304` and are skipped.
 - **Transformer pipeline**: tries Claude CLI transform first, then static fallback.
+- **Bundled fallback**: when fetch or manual-split fails, pulse installs pre-built skills from `skills-fallback/` so you always have a working reference.
 - **SessionStart hook**: runs daily stale-aware sync (`--if-stale 86400`) and one-time greet.
 
 ## Configuration
@@ -317,5 +322,7 @@ Create `.pulserc.json` in your project:
 ## Contributing
 
 - Improve static skill sources under `src/static-skills/`.
-- Improve tutor and learning content in `cc-tutor.md` and `cc-learning-path.md`.
+- Improve tutor and learning content in `pulse.md` and `cc-learning-path.md`.
+- Adjust the dynamic skill index generator in `src/core/skill-index.ts`.
 - Add/adjust tests in `tests/` when changing fetch, transform, split, or hook behavior.
+- After changes, run `npm run build:skills` to regenerate `skills-fallback/`.

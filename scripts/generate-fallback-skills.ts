@@ -14,7 +14,7 @@ const fallbackDir = join(rootDir, 'skills-fallback')
 const staticSkillsDir = join(rootDir, 'src', 'static-skills')
 
 const STATIC_CONTENT_FILES: Record<string, string> = {
-  'cc-tutor': 'cc-tutor.md',
+  'pulse': 'pulse.md',
   'cc-learning-path': 'cc-learning-path.md',
 }
 
@@ -87,7 +87,7 @@ function writeFallbackSkill(
 
 async function processStaticSkill(def: SkillDefinition, syncedAt: string): Promise<number> {
   let body = readStaticSkillBody(def.id)
-  if (def.id === 'cc-tutor') {
+  if (def.id === 'pulse') {
     body = body.trimEnd() + '\n\n' + generateSkillIndex(SKILLS_REGISTRY).trimEnd()
   }
   writeFallbackSkill(

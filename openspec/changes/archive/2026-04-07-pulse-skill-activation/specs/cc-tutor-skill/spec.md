@@ -1,4 +1,10 @@
-## ADDED Requirements
+## RENAMED Requirements
+
+### Requirement: Tutor skill frontmatter
+FROM: `cc-tutor/SKILL.md` with `name: cc-tutor`
+TO: `pulse/SKILL.md` with `name: pulse`
+
+## MODIFIED Requirements
 
 ### Requirement: Tutor skill frontmatter
 The `pulse/SKILL.md` file SHALL include YAML frontmatter with `name: pulse`, `description` matching the registry description for the pulse skill, `_pulse: true`, and `_static: true`. The `disable-model-invocation` field SHALL be omitted (since pulse is auto-activable). The description SHALL mention "pulse", Claude Code guidance, ideas, and documentation-backed help.
@@ -6,13 +12,6 @@ The `pulse/SKILL.md` file SHALL include YAML frontmatter with `name: pulse`, `de
 #### Scenario: Frontmatter fields are present and correct
 - **WHEN** the `pulse/SKILL.md` file is read
 - **THEN** the frontmatter contains `name: pulse`, `_pulse: true`, `_static: true`, does NOT contain `disable-model-invocation`, and has a description referencing Pulse as a Claude Code companion
-
-### Requirement: Language detection instruction
-The tutor skill content SHALL instruct Claude to detect the user's language from their first message and respond in that language for the entire session, without asking the user which language they prefer.
-
-#### Scenario: Language detection behavior
-- **WHEN** the pulse skill is activated
-- **THEN** the skill content instructs to detect language automatically and respond in the user's language without asking
 
 ### Requirement: Memory-aware tutor behavior
 The pulse skill SHALL read `~/.claude/pulse/memory.json` at session start BEFORE any other action. On session start with existing memory, it SHALL greet the user by name, show their previous `nextSteps`, and use `level` and `language` from memory. On first session (no memory), it SHALL ask for the user's name, WAIT for the response, detect their language, initialize memory, then assess level with max 2 questions before proceeding. The skill SHALL NEVER use Claude's native auto-memory system — `~/.claude/pulse/memory.json` is the only source of truth.
@@ -105,6 +104,13 @@ The pulse skill SHALL verify all Claude Code information against the installed `
 - **WHEN** the user asks about something very recent
 - **THEN** the skill consults `cc-changelog` for the latest information
 
+### Requirement: Language detection instruction
+The tutor skill content SHALL instruct Claude to detect the user's language from their first message and respond in that language for the entire session, without asking the user which language they prefer.
+
+#### Scenario: Language detection behavior
+- **WHEN** the pulse skill is activated
+- **THEN** the skill content instructs to detect language automatically and respond in the user's language without asking
+
 ### Requirement: Three learning tiers
 The pulse skill SHALL structure learning content in three tiers: Beginner, Intermediate, and Advanced. Beginner SHALL cover installation, first session, basic commands, permission modes, CLAUDE.md, and git workflow. Intermediate SHALL cover settings.json, skills, hooks, MCP, sub-agents, worktrees, headless mode, and /loop. Advanced SHALL cover agent teams, channels, plugins, GitHub Actions, sandboxing, model config, scheduled tasks, and LLM gateway.
 
@@ -144,3 +150,13 @@ The pulse skill SHALL include rules for tutoring behavior: use concrete examples
 #### Scenario: Tutoring rules reference dynamic index
 - **WHEN** the skill content is read
 - **THEN** it contains a reference to the "Skills disponibles" section for recommending skills
+
+## REMOVED Requirements
+
+### Requirement: Level assessment with two questions
+**Reason**: Merged into the new "Memory-aware tutor behavior" requirement which covers the full session-start flow including level assessment.
+**Migration**: The level assessment logic (max 2 questions) is now part of the memory-aware behavior requirement.
+
+### Requirement: Session end saves state
+**Reason**: Replaced by "Progressive topic saving" which saves after EACH topic instead of only at session end.
+**Migration**: The skill now saves progressively. An optional endNote on explicit goodbye is part of the progressive saving flow.

@@ -22,10 +22,10 @@ export const SKILLS_REGISTRY: SkillDefinition[] = [
   // ── STATIC SKILLS (tutor and learning path) ──────────────────
 
   {
-    id: 'cc-tutor',
+    id: 'pulse',
     sourceUrl: null,
-    name: 'cc-tutor',
-    description: 'Interactive Claude Code tutor. Use when the user asks about hooks, MCP, skills, settings, permissions, sub-agents, or wants to learn how Claude Code works.',
+    name: 'pulse',
+    description: "Pulse - your Claude Code companion and tutor. Use when the user types 'pulse', asks about hooks, MCP, skills, settings, permissions or sub-agents, or wants guidance, ideas, or help.",
     disableModelInvocation: false,
     splitStrategy: 'none',
     tokenBudget: 900,

@@ -74,9 +74,9 @@ describe('transformer orchestrator', () => {
 
   it('omits disable-model-invocation when explicitly disabled', async () => {
     const skill: SkillDefinition = {
-      id: 'cc-tutor',
+      id: 'pulse',
       sourceUrl: null,
-      name: 'cc-tutor',
+      name: 'pulse',
       description: 'Tutor skill',
       splitStrategy: 'none',
       priority: 'critical',
