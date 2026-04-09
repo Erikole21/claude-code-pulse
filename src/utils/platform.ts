@@ -30,23 +30,18 @@ export function getHookCommand(): string {
 
 export function isClaudeCliAvailable(): Promise<boolean> {
   return new Promise((resolve) => {
-    const cmd = process.platform === 'win32' ? 'claude.cmd' : 'claude'
-
-    const child = execFile(cmd, ['--version'], { timeout: 5000 }, (err) => {
-      if (err) {
-        if (process.platform === 'win32' && cmd === 'claude.cmd') {
-          // Try without .cmd extension on Windows
-          execFile('claude', ['--version'], { timeout: 5000 }, (err2) => {
-            resolve(!err2)
-          })
-          return
-        }
-        resolve(false)
-        return
+    let resolved = false
+    const done = (value: boolean) => {
+      if (!resolved) {
+        resolved = true
+        resolve(value)
       }
-      resolve(true)
+    }
+
+    const child = execFile('claude', ['--version'], { timeout: 5000 }, (err) => {
+      done(!err)
     })
 
-    child.on('error', () => resolve(false))
+    child.on('error', () => done(false))
   })
 }

@@ -20,6 +20,7 @@ Rules:
 Transform this documentation:`
 
 let cachedCliAvailable: boolean | undefined
+let cliUnavailableWarned = false
 
 async function checkCliAvailable(): Promise<boolean> {
   if (cachedCliAvailable !== undefined) return cachedCliAvailable
@@ -36,6 +37,7 @@ async function checkCliAvailable(): Promise<boolean> {
  */
 export function resetCliCache(): void {
   cachedCliAvailable = undefined
+  cliUnavailableWarned = false
 }
 
 /**
@@ -49,21 +51,22 @@ export async function transformWithClaude(
 ): Promise<string | null> {
   const available = await checkCliAvailable()
   if (!available) {
-    warn('Claude CLI not available, skipping AI transformation')
+    if (!cliUnavailableWarned) {
+      warn('Claude CLI not available, using static fallback for all skills')
+      cliUnavailableWarned = true
+    }
     return null
   }
 
-  const cmd = process.platform === 'win32' ? 'claude' : 'claude'
   const args = [
     '--print',
-    '--model', 'claude-haiku-4-5-20251001',
-    '--max-tokens', String(tokenBudget),
+    '--model', 'haiku',
   ]
 
-  const input = `${TRANSFORM_PROMPT}\n\n${rawMarkdown}`
+  const input = `${TRANSFORM_PROMPT}\n\nToken budget: ~${tokenBudget} tokens. Keep the output under ${tokenBudget * 4} characters.\n\n${rawMarkdown}`
 
   return new Promise((resolve) => {
-    const child = execFile(cmd, args, {
+    const child = execFile('claude', args, {
       timeout: 30_000,
       maxBuffer: 1024 * 1024,
       encoding: 'utf-8',

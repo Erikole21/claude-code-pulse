@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(C:\\Users\\eriko\\.claude\\pulse/**)",
+      "Edit(C:\\Users\\eriko\\.claude\\pulse/**)",
+      "Write(C:\\Users\\eriko\\.claude\\pulse/**)",
+      "Read(~/.claude/pulse/**)",
+      "Edit(~/.claude/pulse/**)",
+      "Write(~/.claude/pulse/**)",
+      "Read(~\\.claude\\pulse\\**)",
+      "Edit(~\\.claude\\pulse\\**)",
+      "Write(~\\.claude\\pulse\\**)",
+      "Bash(pulse memory*)"
+    ]
+  }
+}
