@@ -1,6 +1,6 @@
 {
   "name": "claude-code-tutor",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Keep Claude Code alive. Fresh docs, built-in tutor, always in sync.",
   "type": "module",
   "bin": {
