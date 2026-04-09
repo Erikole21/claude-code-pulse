@@ -230,13 +230,19 @@ pulse init
 
 ## What pulse does
 
-- **Doc sync**: downloads Claude Code docs and keeps skills fresh.
+- **Auto-discovery**: reads [`llms.txt`](https://code.claude.com/docs/llms.txt) to discover every documentation page published by Anthropic. New pages are detected automatically — no package update needed.
+- **120+ skills**: ships with 23 curated skills and ~100 auto-discovered skills covering the entire Claude Code documentation.
+- **Doc sync**: keeps all skills fresh via daily ETag-based sync. Only changed docs are re-downloaded.
 - **Bundled fallback**: if the official docs are unreachable, pulse installs pre-built skills so you are never left without reference material.
-- **Built-in tutor**: includes `pulse` for guided help in-session. Reads your memory first, greets you by name, and saves progress incrementally so nothing is lost if the session ends unexpectedly.
-- **Learning path**: includes `cc-learning-path` for structured onboarding.
-- **Skill index**: dynamically generates a reference index of all installed skills and appends it to `pulse`, so Pulse always knows which skills to recommend.
+- **Built-in tutor**: includes `pulse` for guided help in-session. Reads your memory first, greets you by name, saves progress incrementally, and notifies you about new features relevant to your level.
+- **Learning path**: includes `cc-learning-path` for structured onboarding from beginner to advanced, with exercises and checkpoints.
+- **Skill index**: dynamically generates a reference index of all installed skills and appends it to both `pulse` and `cc-learning-path`, so they always know what's available.
 
 ## Skills
+
+### Curated skills (23)
+
+Hand-configured with custom split strategies, token budgets, and descriptions:
 
 | ID | Description | Priority |
 |---|---|---|
@@ -263,6 +269,14 @@ pulse init
 | `cc-common-workflows` | Common development workflows. | `medium` |
 | `cc-best-practices` | Recommended practices and patterns. | `medium` |
 | `cc-github-actions` | Claude Code integration with GitHub Actions. | `medium` |
+
+### Auto-discovered skills (~100)
+
+Automatically discovered from the [official docs index](https://code.claude.com/docs/llms.txt). These cover every documentation page Anthropic publishes, including: Chrome integration, VS Code extension, JetBrains, voice dictation, computer use, code review, desktop app, Slack, remote control, ultraplan, enterprise deployments (Bedrock, Vertex AI, Foundry), and more.
+
+Discovered skills are installed alongside curated skills during `init` and updated daily via the sync hook. When Anthropic adds a new doc page, it appears automatically on the next sync — no package update required.
+
+Run `pulse list` to see all installed skills.
 
 ## Team usage
 
@@ -303,9 +317,10 @@ Memory is stored locally and never leaves your machine. Use `pulse uninstall --p
 
 ## Sync mechanism
 
-- **ETag caching**: unchanged docs return `304` and are skipped.
-- **Transformer pipeline**: tries Claude CLI transform first, then static fallback. Truncated skills include a note directing Claude to fetch the full official documentation instead of guessing.
-- **Bundled fallback**: when fetch or manual-split fails, pulse installs pre-built skills from `skills-fallback/` so you always have a working reference.
+- **Auto-discovery**: fetches `llms.txt` from the official docs, detects new pages not in the curated registry, and installs them as skills automatically.
+- **ETag caching**: unchanged docs (including `llms.txt` itself) return `304` and are skipped — zero overhead on most syncs.
+- **Static transformer**: condenses docs to fit token budgets. Truncated skills include a note directing Claude to fetch the full official documentation instead of guessing.
+- **Bundled fallback**: `init` installs 120+ pre-built skills instantly from the package — no network needed.
 - **SessionStart hook**: runs daily stale-aware sync (`--if-stale 86400`) and injects tutor activation context every session.
 
 ## Configuration
@@ -325,7 +340,7 @@ Create `.pulserc.json` in your project:
 |---|---|---|---|
 | `skills` | `["critical","high"]` | `["critical"]`, `["critical","high"]`, `["all"]`, etc. | Skill priorities to sync. |
 | `maxAge` | `86400` | number (seconds) | Staleness threshold for auto-sync decisions. |
-| `transformer` | `"auto"` | `"auto"`, `"static"` | Transformation mode. `auto` prefers Claude CLI. |
+| `transformer` | `"static"` | `"static"` | Transformation mode. Static transformer condenses docs locally. |
 | `silent` | `false` | `true`, `false` | Suppress non-error output. |
 
 ## Troubleshooting
@@ -333,7 +348,7 @@ Create `.pulserc.json` in your project:
 - **Hook does not run**: check `.claude/settings.json` has a `SessionStart` entry with `_pulse: true`.
 - **Windows behavior**: pulse uses `npx.cmd` on native Windows and Unix format on WSL.
 - **Skills look stale**: run `pulse sync --force` to bypass ETag cache.
-- **Claude CLI unavailable**: pulse automatically falls back to static transformer.
+- **New docs not showing up**: run `pulse sync --force` to re-run discovery and fetch all docs.
 
 ## Contributing
 

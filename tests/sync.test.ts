@@ -196,7 +196,7 @@ describe('sync command static skills', () => {
 
     expect(results).toHaveLength(2)
     expect(results.map((r) => r.id)).toEqual(['pulse', 'cc-learning-path'])
-    expect(generateSkillIndexMock).toHaveBeenCalledTimes(1)
+    expect(generateSkillIndexMock).toHaveBeenCalledTimes(2)
 
     const tutorInstallCall = installMock.mock.calls.find((call) => call[0][0].id === 'pulse')
     const learningPathInstallCall = installMock.mock.calls.find(
@@ -211,8 +211,8 @@ describe('sync command static skills', () => {
 
     expect(tutorContent).toContain('Tutor base content')
     expect(tutorContent).toContain('## Skills disponibles')
-    expect(learningPathContent).toBe('Learning path base content')
-    expect(learningPathContent).not.toContain('## Skills disponibles')
+    expect(learningPathContent).toContain('Learning path base content')
+    expect(learningPathContent).toContain('## Skills disponibles')
   })
 
   it('prunes obsolete managed skills when force is enabled', async () => {

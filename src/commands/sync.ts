@@ -111,7 +111,7 @@ export async function syncCore(options: SyncOptions): Promise<SyncResult[]> {
         for (const fid of fallbackIds) {
           try {
             let content = loadStaticSkillContent(fid)
-            if (fid === 'pulse') {
+            if (fid === 'pulse' || fid === 'cc-learning-path') {
               content = injectSkillIndex(content, discoveredSkills)
             }
             install([{ id: fid, content }])

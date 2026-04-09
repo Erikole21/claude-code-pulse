@@ -96,7 +96,7 @@ async function processStaticSkill(
   discovered: SkillDefinition[],
 ): Promise<number> {
   let body = readStaticSkillBody(def.id)
-  if (def.id === 'pulse') {
+  if (def.id === 'pulse' || def.id === 'cc-learning-path') {
     body = body.trimEnd() + '\n\n' + generateSkillIndex(SKILLS_REGISTRY, discovered).trimEnd()
   }
   writeFallbackSkill(
