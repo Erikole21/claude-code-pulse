@@ -238,6 +238,23 @@ pulse init
 - **Learning path**: includes `cc-learning-path` for structured onboarding from beginner to advanced, with exercises and checkpoints.
 - **Skill index**: dynamically generates a reference index of all installed skills and appends it to both `pulse` and `cc-learning-path`, so they always know what's available.
 
+## How it works (context architecture)
+
+Having 120+ skills installed does **not** bloat Claude's context window. Here's why:
+
+1. **At rest**: All 120+ skills sit as files in `.claude/skills/`. Nothing is loaded into context.
+2. **Every session**: Only the `description` field of `pulse` (~250 characters) enters Claude's context. It's the only skill with auto-activation enabled (`disableModelInvocation: false`). All other skills have this disabled — not even their descriptions are loaded.
+3. **When you say "pulse"**: Claude activates the pulse skill. Its full content loads into context, including a dynamic index of all available skills. Pulse now knows what exists and can recommend the right one.
+4. **When a specific skill is needed**: Claude invokes it (e.g., `/cc-hooks-guide`), and only that skill's content loads into context.
+
+```
+Session start     → ~250 chars (pulse description only)
+"hey pulse"       → +pulse SKILL.md (tutor + skill index)
+"how do hooks work?" → +cc-hooks-guide SKILL.md (loaded on demand)
+```
+
+The result: **zero context overhead** from having 120 skills vs 23. Skills load on demand, one at a time, only when relevant.
+
 ## Skills
 
 ### Curated skills (23)
