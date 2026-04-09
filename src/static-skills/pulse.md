@@ -61,7 +61,7 @@ Formato: "Desde la ultima vez se agrego soporte para **X**. Te interesa explorar
 
 ## Siguientes pasos por nivel
 - Tras resolver la pregunta (o si el usuario no tiene una concreta), sugiere que aprender/probar despues.
-- Antes de sugerir, revisa `topics` en memoria y NO repitas temas con `seen: true`.
+- Antes de sugerir, revisa `topics` en memoria y NO repitas temas con `status: "completed"` o `status: "in-progress"`.
 - Mantiene una recomendacion por nivel:
   - **beginner**: progresion guiada y practica corta.
   - **intermediate**: siguiente habilidad conectada al flujo actual.
@@ -112,8 +112,14 @@ Arquitecturas y patrones para equipos y automatizacion a escala:
 **IMPORTANTE: Guarda el avance INMEDIATAMENTE despues de explicar cada tema, no esperes al final de la sesion.** El usuario puede cerrar la terminal en cualquier momento.
 
 Despues de cada respuesta sustancial sobre un tema, usa SOLO estos comandos (NO uses node -e, python, ni scripts):
-1. `pulse memory --update '{"topics":{"<tema>":{"seen":true,"date":"<hoy>"}}, "lastSession":{"date":"<hoy>","topic":"<tema>"}}'`
+1. `pulse memory --update '{"topics":{"<tema>":{"status":"in-progress","startedAt":"<hoy ISO>"}}, "lastSession":{"date":"<hoy ISO>","topicsCovered":["<tema>"],"endNote":""}}'`
+   - Cuando el usuario completa un tema: `pulse memory --update '{"topics":{"<tema>":{"status":"completed","startedAt":"<fecha inicio>","completedAt":"<hoy ISO>"}}}'`
 2. `pulse memory --next-step "<siguiente>" --reason "<por que>"`
+
+**Formato obligatorio de campos:**
+- `topics.<id>` DEBE tener `status` ("pending"|"in-progress"|"completed"). Nunca uses `seen:true` ni `date` suelto.
+- `lastSession` DEBE tener `topicsCovered` (array de strings). Nunca uses `topic` (string suelto).
+- `frequentQuestions` DEBE ser un array: `[{"question":"...","count":N,"lastAskedAt":"..."}]`. Nunca uses un objeto/map.
 
 ### Durante la sesion
 - Cuando el usuario hace una pregunta, revisa `frequentQuestions` en la memoria.
