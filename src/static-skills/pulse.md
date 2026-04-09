@@ -111,9 +111,9 @@ Arquitecturas y patrones para equipos y automatizacion a escala:
 ### Despues de cada tema explicado (guardado progresivo)
 **IMPORTANTE: Guarda el avance INMEDIATAMENTE despues de explicar cada tema, no esperes al final de la sesion.** El usuario puede cerrar la terminal en cualquier momento.
 
-Despues de cada respuesta sustancial sobre un tema:
-1. Actualiza temas vistos y `lastSession` de inmediato con `pulse memory --update '{"topics":{"<tema>":{"seen":true,"date":"<hoy>"}}, "lastSession":{"date":"<hoy>","topic":"<tema>"}}'`
-2. Si hay siguiente paso natural, guardalo INMEDIATAMENTE con `pulse memory --next-step "<siguiente>" --reason "<por que>"`
+Despues de cada respuesta sustancial sobre un tema, usa SOLO estos comandos (NO uses node -e, python, ni scripts):
+1. `pulse memory --update '{"topics":{"<tema>":{"seen":true,"date":"<hoy>"}}, "lastSession":{"date":"<hoy>","topic":"<tema>"}}'`
+2. `pulse memory --next-step "<siguiente>" --reason "<por que>"`
 
 ### Durante la sesion
 - Cuando el usuario hace una pregunta, revisa `frequentQuestions` en la memoria.
@@ -127,13 +127,19 @@ Si el usuario se despide explicitamente:
 
 ## Comandos de memoria disponibles para el tutor
 
-**REGLA ESTRICTA: Para ESCRIBIR memoria, usa UNICAMENTE los comandos `pulse memory` listados abajo. NUNCA manipules el archivo memory.json directamente con cat, python, echo, jq, sed, ni ninguna otra herramienta. Los comandos `pulse memory` validan y hacen merge correcto del JSON.**
+**REGLA CRITICA — LEER ANTES DE CUALQUIER ESCRITURA DE MEMORIA:**
+Para ESCRIBIR o ACTUALIZAR la memoria del tutor, usa **EXCLUSIVAMENTE** los comandos `pulse memory` listados abajo.
 
-- Herramienta **Read** sobre `~/.claude/pulse/memory.json` — leer memoria (unica excepcion de acceso directo, solo lectura)
+**PROHIBIDO:** `node -e`, `python -c`, `cat >`, `echo >`, `jq`, `sed`, `fs.writeFileSync`, o cualquier otra forma de manipular `memory.json` directamente. Estas alternativas NO tienen permisos pre-aprobados y el usuario tendra que aprobar cada ejecucion manualmente.
+
+**PERMITIDO (pre-aprobado, sin prompts):**
+- Herramienta **Read** sobre `~/.claude/pulse/memory.json` — leer memoria
 - `pulse memory` — ver resumen de progreso del usuario
 - `pulse memory --update '<JSON>'` — actualizar campos de memoria
 - `pulse memory --exercise <id> --status <status>` — marcar ejercicios
 - `pulse memory --next-step "<desc>" --reason "<razon>"` — agregar proximo paso
+
+Estos comandos estan pre-aprobados en los permisos del proyecto. Usarlos garantiza cero interrupciones al usuario.
 
 ## Reglas de tutoria
 - Usa ejemplos concretos y comandos reales, nunca teoria abstracta.
